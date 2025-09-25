@@ -47,6 +47,8 @@ This addon requires:
 - Valid API token with write permissions
 - CORS configured to allow requests from browser extensions
 
+**Pinry Project**: [https://github.com/pinry/pinry](https://github.com/pinry/pinry)
+
 ## Technical Details
 
 ### Features
@@ -85,3 +87,7 @@ The addon is built with:
 ## License
 
 MIT License - feel free to modify and distribute.
+
+---
+
+**GitHub Repository**: [https://github.com/sciamop/pinry-saver-firefox](https://github.com/sciamop/pinry-saver-firefox)

@@ -122,6 +122,26 @@ body {
   transform: none;
 }
 
+/* Footer */
+.footer {
+  margin-top: 16px;
+  text-align: center;
+  padding-top: 16px;
+  border-top: 1px solid #e9ecef;
+}
+
+.github-link {
+  color: #6c757d;
+  text-decoration: none;
+  font-size: 12px;
+  transition: color 0.2s ease;
+}
+
+.github-link:hover {
+  color: #FF42FF;
+  text-decoration: underline;
+}
+
 .btn-secondary {
   background: #6c757d;
   color: white;

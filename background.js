@@ -159,15 +159,17 @@ async function shareToPinry(pinData) {
   }
 }
 
-// Context menu for right-click sharing
-browser.contextMenus.create({
-  id: 'save-to-pinry',
-  title: 'Save to Pinry',
-  contexts: ['image'],  // Only show for images
-  icons: {
-    "16": "icons/pinry_saver_bitmap_icon.png",
-    "32": "icons/pinry_saver_bitmap_icon.png"
-  }
+// Create context menu on addon installation
+browser.runtime.onInstalled.addListener(() => {
+  browser.contextMenus.create({
+    id: 'save-to-pinry',
+    title: 'Save to Pinry',
+    contexts: ['image'],  // Only show for images
+    icons: {
+      "16": "icons/pinry_saver_bitmap_icon_white.png",
+      "32": "icons/pinry_saver_bitmap_icon_white.png"
+    }
+  });
 });
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {

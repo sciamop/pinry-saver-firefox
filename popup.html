@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="icons/pinry_saver_bitmap_icon.png" alt="Pinry" class="header-icon">
+    </div>
+    
+    <div class="content">
+      
+      
+      <div class="form-section">
+        <div class="form-group">
+          <label for="pinryUrl">Pinry Server URL:</label>
+          <input type="url" id="pinryUrl" placeholder="https://your-pinry-instance.com">
+        </div>
+        
+        <div class="form-group">
+          <label for="apiKey">API Key:</label>
+          <input type="password" id="apiKey" placeholder="Your Pinry API key">
+        </div>
+        
+        <div class="form-group">
+          <label for="defaultBoardId">Default Board ID (optional):</label>
+          <input type="text" id="defaultBoardId" placeholder="Leave empty to use default board">
+        </div>
+      </div>
+      
+      <div class="actions">
+        <button id="saveSettings" class="btn btn-primary">Save Settings</button>
+      </div>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>

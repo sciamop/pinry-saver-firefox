@@ -163,7 +163,11 @@ async function shareToPinry(pinData) {
 browser.contextMenus.create({
   id: 'save-to-pinry',
   title: 'Save to Pinry',
-  contexts: ['image']  // Only show for images
+  contexts: ['image'],  // Only show for images
+  icons: {
+    "16": "icons/pinry_saver_bitmap_icon.png",
+    "32": "icons/pinry_saver_bitmap_icon.png"
+  }
 });
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {

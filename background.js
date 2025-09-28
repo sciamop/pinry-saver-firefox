@@ -111,6 +111,127 @@ async function getCurrentTab() {
   }
 }
 
+async function extractEnhancedDescription(info, tab) {
+  const parts = [];
+  
+  try {
+    // Try to extract domain from page URL (robust handling)
+    let domain = null;
+    if (tab && tab.url) {
+      try {
+        const pageUrl = new URL(tab.url);
+        domain = pageUrl.hostname;
+      } catch (urlError) {
+        console.log('Invalid page URL:', tab.url);
+      }
+    }
+    
+    // Try to get image metadata from the page (only if we have a valid tab)
+    let imageMetadata = null;
+    if (tab && tab.id && info.srcUrl) {
+      try {
+        imageMetadata = await browser.tabs.executeScript(tab.id, {
+          code: `
+            try {
+              // Find the image element that was right-clicked
+              const images = document.querySelectorAll('img');
+              let targetImage = null;
+              
+              for (const img of images) {
+                if (img.src === '${info.srcUrl}' || img.currentSrc === '${info.srcUrl}') {
+                  targetImage = img;
+                  break;
+                }
+              }
+              
+              // Extract alt and title attributes (handle null/undefined)
+              let altText = '';
+              let titleText = '';
+              
+              if (targetImage) {
+                altText = targetImage.getAttribute('alt') || '';
+                titleText = targetImage.getAttribute('title') || '';
+              }
+              
+              // Return the metadata
+              JSON.stringify({
+                alt: altText,
+                title: titleText,
+                found: !!targetImage
+              });
+            } catch (e) {
+              JSON.stringify({
+                alt: '',
+                title: '',
+                found: false,
+                error: e.message
+              });
+            }
+          `
+        });
+      } catch (scriptError) {
+        console.log('Could not execute script to extract image metadata:', scriptError);
+      }
+    }
+    
+    // Process image metadata if available
+    if (imageMetadata && imageMetadata[0]) {
+      try {
+        const metadata = JSON.parse(imageMetadata[0]);
+        
+        // Add alt text if available and not empty
+        if (metadata.alt && typeof metadata.alt === 'string' && metadata.alt.trim()) {
+          parts.push(metadata.alt.trim());
+        }
+        
+        // Add title text if available, different from alt, and not empty
+        if (metadata.title && 
+            typeof metadata.title === 'string' && 
+            metadata.title.trim() && 
+            metadata.title.trim() !== metadata.alt?.trim()) {
+          parts.push(metadata.title.trim());
+        }
+      } catch (parseError) {
+        console.log('Error parsing image metadata:', parseError);
+      }
+    }
+    
+    // Add domain if available
+    if (domain) {
+      parts.push(`Source: ${domain}`);
+    }
+    
+    // Return description or fallback
+    if (parts.length > 0) {
+      return parts.join(' | ');
+    } else {
+      // Ultimate fallback - use image filename or generic text
+      if (info.srcUrl) {
+        try {
+          const imageUrl = new URL(info.srcUrl);
+          const filename = imageUrl.pathname.split('/').pop();
+          if (filename && filename.includes('.')) {
+            return `Image: ${filename}`;
+          }
+        } catch (e) {
+          // URL parsing failed, use the last part of the path
+          const pathParts = info.srcUrl.split('/');
+          const lastPart = pathParts[pathParts.length - 1];
+          if (lastPart && lastPart.includes('.')) {
+            return `Image: ${lastPart}`;
+          }
+        }
+      }
+      return 'Saved image';
+    }
+    
+  } catch (error) {
+    console.error('Error extracting enhanced description:', error);
+    // Return a basic fallback
+    return 'Saved image';
+  }
+}
+
 async function shareToPinry(pinData) {
   try {
     const settings = await browser.storage.sync.get(['pinryUrl', 'apiKey']);
@@ -185,14 +306,15 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
       // Right-clicked on an image
       if (info.srcUrl) {
         const imageUrl = info.srcUrl;
-        const imageTitle = info.srcUrl.split('/').pop() || 'Image';
         
         console.log('Saving image to Pinry:', imageUrl);
         
-        // Simple URL approach - this works for most images
+        // Extract enhanced description with image metadata and page domain
+        const description = await extractEnhancedDescription(info, tab);
+        
         const pinData = {
           url: imageUrl,
-          description: imageTitle,
+          description: description,
           tags: []
         };
 

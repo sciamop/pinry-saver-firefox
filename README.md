@@ -2,6 +2,8 @@
 
 A Firefox browser extension for saving images directly to your Pinry instance with a clean, modern interface.
 
+Install the add-on: https://addons.mozilla.org/en-US/firefox/addon/pinry-saver/
+
 ## Features
 
 - **Right-Click Image Sharing**: Right-click on any image to save it to Pinry
